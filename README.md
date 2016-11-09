@@ -5,7 +5,8 @@ VMSS Template Generator
 
 Auto-generate most of the VMSS templates in the Azure Quickstart Templates repo for easy update.
 
-
+- jumpbox vs. nat rules vs. both
+- premium vs. standard storage vs. both
 
 
 
