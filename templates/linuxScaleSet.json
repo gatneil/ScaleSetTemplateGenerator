@@ -47,35 +47,9 @@
 	    "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), '3')))]",
 	    "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), '4')))]"
 	],
-	"saCount": "[length(variables('uniqueStringArray'))]",
-	"vhdContainerName": "vhds",
-	"vnetName": "vnet",
-	"subnetName": "subnet",
-	"vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('vnetName'))]",
-	"subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]"
+	"saCount": "[length(variables('uniqueStringArray'))]"
     },
     "resources": [
-	{
-	    "type": "Microsoft.Network/virtualNetworks",
-	    "name": "[variables('vnetName')]",
-	    "location": "[resourceGroup().location]",
-	    "apiVersion": "2016-03-30",
-	    "properties": {
-		"addressSpace": {
-		    "addressPrefixes": [
-			"10.0.0.0/16"
-		    ]
-		},
-		"subnets": [
-		    {
-			"name": "[variables('subnetName')]",
-			"properties": {
-			    "addressPrefix": "10.0.0.0/24"
-			}
-		    }
-		]
-	    }
-	},
 	{
 	    "type": "Microsoft.Storage/storageAccounts",
 	    "name": "[concat(variables('uniqueStringArray')[copyIndex()], variables('newStorageAccountSuffix'))]",
@@ -95,8 +69,7 @@
 	    "location": "[resourceGroup().location]",
 	    "apiVersion": "2016-03-30",
 	    "dependsOn": [
-		"storageLoop",
-		"[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+		"storageLoop"
 	    ],
 	    "sku": {
 		"name": "[parameters('vmSku')]",
@@ -112,11 +85,11 @@
 		    "storageProfile": {
 			"osDisk": {
 			    "vhdContainers": [
-				"[concat('https://', variables('uniqueStringArray')[0], variables('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]",
-				"[concat('https://', variables('uniqueStringArray')[1], variables('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]",
-				"[concat('https://', variables('uniqueStringArray')[2], variables('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]",
-				"[concat('https://', variables('uniqueStringArray')[3], variables('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]",
-				"[concat('https://', variables('uniqueStringArray')[4], variables('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]"
+				"[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[0], variables('newStorageAccountSuffix')), '2015-06-15').primaryEndpoints.blob, 'vhds')]",
+				"[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[1], variables('newStorageAccountSuffix')), '2015-06-15').primaryEndpoints.blob, 'vhds')]",
+				"[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[2], variables('newStorageAccountSuffix')), '2015-06-15').primaryEndpoints.blob, 'vhds')]",
+				"[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[3], variables('newStorageAccountSuffix')), '2015-06-15').primaryEndpoints.blob, 'vhds')]",
+				"[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[4], variables('newStorageAccountSuffix')), '2015-06-15').primaryEndpoints.blob, 'vhds')]"
 			    ],
 			    "name": "osdisk",
 			    "caching": "ReadOnly",
@@ -145,7 +118,6 @@
 					    "name": "ipconfig",
 					    "properties": {
 						"subnet": {
-						    "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworks/', variables('vnetName'), '/subnets/', variables('subnetName'))]"
 						}
 					    }
 					}
